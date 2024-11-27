@@ -1,0 +1,57 @@
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    exclude:
+      - iac/**
+
+parameters:
+  - name: containerRegistry
+    type: string
+    default: "acrspringbootreact.azurecr.io"
+  - name: repository
+    type: string
+    default: "springboot-react"
+  - name: imageTag
+    default: "$(Build.BuildId)"
+  - name: appName
+    default: "lwapp-springboot-react"
+  - name: resourceGroup
+    default: "rg-springboot-react-project"
+
+variables:
+  - group: "springboot-react"
+
+stages:
+- stage : buildAndDeploy
+  jobs:
+  - job: build
+    displayName: "Build and Deploy"
+    steps:
+      - task: Maven@4
+        displayName: "Build and Test Maven App"
+        inputs:
+            goals: 'clean package -DskipTests=false'
+
+      - script: |
+          az login --service-principal \
+          --username $(clientId) \
+          --password $(clientSecret) \
+          --tenant $(tenantId)
+          az account show
+          az acr login --name ${{parameters.containerRegistry}}
+        displayName: "Azure CLI Login"
+
+      - script: |
+          docker build -t ${{parameters.containerRegistry}}/${{parameters.repository}}:${{parameters.imageTag}} .
+          docker push ${{parameters.containerRegistry}}/${{parameters.repository}}:${{parameters.imageTag}}
+        displayName: "Build and Push Docker Image"
+
+      - script: |
+          az webapp config container set \
+            --name ${{parameters.appName}} \
+            --resource-group ${{parameters.resourceGroup}} \
+            --container-image-name ${{parameters.containerRegistry}}/${{parameters.repository}}:${{parameters.imageTag}} \
+            --container-registry-url https://${{parameters.containerRegistry}}
+        displayName: "Deploy Docker Image"
