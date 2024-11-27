@@ -1,0 +1,97 @@
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+      - iac/**
+
+parameters:
+  - name: workingDirectory
+    type: string
+    default: "./iac"
+
+variables:
+  - name: terraformVersion
+    value: "1.5.7"
+  - name: artifactName
+    value: "terraform_plan"
+  - group: "springboot-react"
+
+
+stages:
+- stage: CI
+  displayName: "Terraform CI"
+  jobs:
+  - job: terraformCI
+    displayName: "Validate CI"
+    steps:
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@1
+        displayName: "Install Terraform"
+        inputs:
+          terraformVersion: $(terraformVersion)
+          
+      - script: |
+          terraform init
+        displayName: "Terraform Init"
+        workingDirectory: ${{parameters.workingDirectory}}
+        env:
+          ARM_SUBSCRIPTION_ID: $(subscriptionId)
+          ARM_TENANT_ID: $(tenantId)
+          ARM_CLIENT_ID: $(clientId)
+          ARM_CLIENT_SECRET: $(clientSecret)
+
+      - script: |
+          terraform validate
+        displayName: "Terraform Validate"
+        workingDirectory: ${{parameters.workingDirectory}}
+
+      - script: |
+          terraform plan -out=terraform_plan -input=false
+        displayName: "Terraform Plan"
+        workingDirectory: ${{parameters.workingDirectory}}
+        env:
+          ARM_SUBSCRIPTION_ID: $(subscriptionId)
+          ARM_TENANT_ID: $(tenantId)
+          ARM_CLIENT_ID: $(clientId)
+          ARM_CLIENT_SECRET: $(clientSecret)
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: $(Build.SourcesDirectory)
+          artifactName: $(artifactName)
+          displayName: "Publish plan"
+      
+- stage: deployment
+  displayName: "Deploy Infra"
+  jobs:
+  - job: infraDeployment
+    displayName: "Infra Deployment"
+    steps:      
+      - download: current
+        artifact: $(artifactName)
+        displayName: "Download $(artifactName) artifact"
+      
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@1
+        displayName: "Install Terraform"
+        inputs:
+          terraformVersion: $(terraformVersion)
+
+      - script: |
+          az login --service-principal \
+          --username $(clientId) \
+          --password $(clientSecret) \
+          --tenant $(tenantId)
+          az account show
+        displayName: "Azure CLI Login"
+
+      - script: |
+          chmod -R a+x .terraform/providers/
+          terraform apply -auto-approve -input=false terraform_plan
+        displayName: "Terraform apply"
+        workingDirectory: $(Pipeline.Workspace)/$(artifactName)/${{parameters.workingDirectory}}
+        env:
+          ARM_SUBSCRIPTION_ID: $(subscriptionId)
+          ARM_TENANT_ID: $(tenantId)
+          ARM_CLIENT_ID: $(clientId)
+          ARM_CLIENT_SECRET: $(clientSecret)

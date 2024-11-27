@@ -1,0 +1,33 @@
+trigger: none
+
+parameters:
+  - name: workingDirectory
+    type: string
+    default: "./iac/backend"
+      
+variables:
+  - group: "springboot-react"
+
+stages:
+- stage: backendDeployment
+  displayName: "Terraform Backend Deployment"
+  jobs:
+  - job: deployBackend
+    displayName: "Deploy Terraform Backend"
+    steps:
+      - script: |
+          az login --service-principal \
+          --username $(clientId) \
+          --password $(clientSecret) \
+          --tenant $(tenantId)
+        displayName: "Azure CLI Login"
+        workingDirectory: ${{parameters.workingDirectory}}
+      
+      - script: |
+          echo "Making script executable"
+          chmod +x ./st_backend.sh
+
+          echo "Running script"
+          ./st_backend.sh
+        displayName: "Deploy Resource group, Storage with Container"
+        workingDirectory: ${{parameters.workingDirectory}}
