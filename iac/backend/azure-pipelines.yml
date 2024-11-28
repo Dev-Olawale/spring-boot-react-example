@@ -1,7 +1,6 @@
 trigger: none
 pool:
   name: Default
-  demands: agent.name -equals YourAgentName
 
 parameters:
   - name: workingDirectory
