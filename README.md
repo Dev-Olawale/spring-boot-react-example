@@ -4,7 +4,7 @@ The application has a react frontend and a Spring Boot Rest API, packaged as a s
 
 You can test the main API using the following curl commands (shown with its output):
 
----
+----
 
 \$ curl -v -u greg:turnquist localhost:8080/api/employees/3
 {
