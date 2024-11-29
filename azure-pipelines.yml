@@ -6,9 +6,6 @@ trigger:
     exclude:
       - iac/**
 
-pool:
-  name: Default
-  
 parameters:
   - name: containerRegistry
     type: string
