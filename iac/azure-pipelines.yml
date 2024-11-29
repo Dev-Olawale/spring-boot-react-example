@@ -5,7 +5,10 @@ trigger:
   paths:
     include:
       - iac/**
-
+      
+pool:
+  name: Default1
+  
 parameters:
   - name: workingDirectory
     type: string
