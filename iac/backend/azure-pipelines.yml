@@ -1,4 +1,5 @@
 trigger: none
+
 pool:
   name: Default
 
@@ -17,6 +18,14 @@ stages:
   - job: deployBackend
     displayName: "Deploy Terraform Backend"
     steps:
+      # Install Azure CLI
+      - script: |
+          echo "Installing Azure CLI..."
+          curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+          az version
+        displayName: "Install Azure CLI"
+
+      # Azure CLI Login
       - script: |
           az login --service-principal \
           --username $(clientId) \
@@ -24,12 +33,13 @@ stages:
           --tenant $(tenantId)
         displayName: "Azure CLI Login"
         workingDirectory: ${{parameters.workingDirectory}}
-      
+
+      # Run your custom shell script
       - script: |
           echo "Making script executable"
           chmod +x ./st_backend.sh
 
           echo "Running script"
           ./st_backend.sh
-        displayName: "Deploy Resource group, Storage with Container"
+        displayName: "Deploy Resource Group, Storage with Container"
         workingDirectory: ${{parameters.workingDirectory}}
