@@ -72,10 +72,10 @@ stages:
         artifact: $(artifactName)
         displayName: "Download $(artifactName) artifact"
       
-      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@1
-        displayName: "Install Terraform"
-        inputs:
-          terraformVersion: $(terraformVersion)
+      # - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@1
+      #   displayName: "Install Terraform"
+      #   inputs:
+      #     terraformVersion: $(terraformVersion)
 
       - script: |
           az login --service-principal \
