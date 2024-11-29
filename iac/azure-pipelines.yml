@@ -26,10 +26,10 @@ stages:
   - job: terraformCI
     displayName: "Validate CI"
     steps:
-      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@1
-        displayName: "Install Terraform"
-        inputs:
-          terraformVersion: $(terraformVersion)
+      # - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@1
+      #   displayName: "Install Terraform"
+      #   inputs:
+      #     terraformVersion: $(terraformVersion)
           
       - script: |
           terraform init
