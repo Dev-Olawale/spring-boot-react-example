@@ -16,9 +16,9 @@ resource "azurerm_linux_web_app" "springboot_react_app" {
   location            = var.location
   resource_group_name = var.resource_group_name
   service_plan_id     = azurerm_service_plan.main.id
+  https_only          = true
 
-  site_config {
-  }
+  site_config {}
 
   identity {
     type = "SystemAssigned"
