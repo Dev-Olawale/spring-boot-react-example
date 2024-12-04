@@ -2,12 +2,13 @@ trigger:
   branches:
     include:
     - main
+    - dev
   paths:
     exclude:
       - iac/**
 
 pool:
-  name: Default1
+  name: MyLinuxAgent
 
 parameters:
   - name: containerRegistry
