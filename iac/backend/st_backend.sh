@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Variables
-resource_group_name="rg-springboot-react-backend"
+resource_group_name="rg-springboot-react-backends"
 location="westeurope"
-storage_account_name="stjavatfstate"
+storage_account_name="stjavatfstate1"
 container_name="java"
 
 # Create the Resource Group
