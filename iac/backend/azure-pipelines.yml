@@ -1,7 +1,7 @@
 trigger: none
 
-# pool:
-#   name: Default1
+pool:
+  name: MyLinuxAgent
 
 parameters:
   - name: workingDirectory
