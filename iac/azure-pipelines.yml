@@ -21,13 +21,21 @@ variables:
     value: "terraform_plan"
   - group: "springboot-react"
 
-
 stages:
 - stage: CI
   displayName: "Terraform CI"
   jobs:
+  - job: terraformLint
+    displayName: "Terraform Lint"
+    steps:
+      - script: |
+          terraform fmt -check -recursive
+        displayName: "Terraform Format Check"
+        workingDirectory: ${{parameters.workingDirectory}}
+
   - job: terraformCI
     displayName: "Validate CI"
+    dependsOn: terraformLint
     steps:
       # - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@1
       #   displayName: "Install Terraform"
