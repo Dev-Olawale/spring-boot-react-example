@@ -100,7 +100,7 @@ tenantId: The tenant ID from Azure Active Directory.
 subscriptionId: The Azure subscription ID.
 Grant pipeline permissions to the variable group.
 
-4. Pipeline Configuration
+4. Pipeline Configuration1
 Infrastructure as Code (IaC) Pipeline
 Add iac-pipeline.yml to the repository.
 Configure the pipeline:
